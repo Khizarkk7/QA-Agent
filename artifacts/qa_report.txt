@@ -1,33 +1,39 @@
---- Homepage (http://192.168.70.94:4200/) ---
-page_title_contains: K Store -> FAIL (MyStore)
-element_exists: nav -> FAIL (not found)
-no_console_errors: None -> PASS (placeholder)
-Console logs:
+--- URL: http://192.168.70.94:4200/login ---
+Title: MyStore
+Status: PASS
+Buttons: 1 checked
+  PASS -> <unknown>
+Forms: 1
+Links (first 5): ['/forgotpass', '/signup']
+Console Errors:
   [debug] [vite] connecting...
   [debug] [vite] connected.
   [log] Angular is running in development mode.
   [warning] Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
---- Product List (http://192.168.70.94:4200/shop/levis) ---
-status_code_200: None -> PASS (200)
-element_exists: .product-card -> FAIL (not found)
-click_and_wait: None -> FAIL (exception: Page.click: Timeout 5000ms exceeded.
-Call log:
-  - waiting for locator(".product-card:first-child a")
-)
-Console logs:
+Screenshot saved: artifacts\1762867448.png
+--- URL: http://192.168.70.94:4200/app-admin/dashboard ---
+Title: None
+Status: FAIL
+Buttons: 0 checked
+Forms: 0
+Links (first 5): []
+Console Errors:
   [debug] [vite] connecting...
   [debug] [vite] connected.
+  [log] Angular is running in development mode.
   [warning] Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
-  [log] Angular is running in development mode.
-  [error] Failed to load resource: the server responded with a status of 404 (Not Found)
-Errors:
-  Traceback (most recent call last):
---- Checkout (http://192.168.70.94:4200/shop/levis/checkout) ---
-page_title_contains: Cart -> FAIL (MyStore)
-element_exists: #checkout-btn -> FAIL (not found)
-Console logs:
+  Frame.fill() missing 1 required positional argument: 'value'
+Screenshot saved: None
+--- URL: http://192.168.70.94:4200/app-admin/shops/1026/products/all ---
+Title: None
+Status: FAIL
+Buttons: 0 checked
+Forms: 0
+Links (first 5): []
+Console Errors:
   [debug] [vite] connecting...
   [debug] [vite] connected.
   [log] Angular is running in development mode.
-  [error]  Error fetching shop by slug: HttpErrorResponse
-  [error] Failed to load resource: net::ERR_CERT_COMMON_NAME_INVALID
+  [warning] Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+  Frame.fill() missing 1 required positional argument: 'value'
+Screenshot saved: None

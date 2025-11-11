@@ -12,7 +12,7 @@ def save_screenshot(page, path):
     try:
         page.screenshot(path=path, full_page=True)
     except Exception as e:
-        print("Screenshot failed:", e)
+        print("[ERROR] Screenshot failed:", e)
 
 def log_info(msg):
     print(f"[INFO] {msg}")

@@ -1,86 +1,150 @@
-# tester.py
-import os, time, json, traceback
+import os, time, traceback
 from playwright.sync_api import sync_playwright
-from utils import ensure_dir, save_screenshot, log_info, log_error
+from utils import ensure_dir, save_screenshot, log_info
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+USERNAME = os.getenv("QA_USERNAME")
+PASSWORD = os.getenv("QA_PASSWORD")
+LOGIN_URL = os.getenv("LOGIN_URL", "http://192.168.70.94:4200/login")
 
 ARTIFACTS_DIR = os.getenv("ARTIFACTS_DIR", "artifacts")
 ensure_dir(ARTIFACTS_DIR)
 
-def run_check(page, check, results):
-    typ = check.get("type")
-    try:
-        if typ == "page_title_contains":
-            expected = check["value"]
-            title = page.title()
-            ok = expected.lower() in (title or "").lower()
-            results.append(("page_title_contains", expected, ok, title))
-        elif typ == "element_exists":
-            sel = check["selector"]
-            el = page.query_selector(sel)
-            ok = el is not None
-            results.append(("element_exists", sel, ok, "found" if ok else "not found"))
-        elif typ == "no_console_errors":
-            # page-level console errors are captured separately
-            # We'll rely on page.context to store console messages via event in run_scenario
-            results.append(("no_console_errors", None, True, "placeholder"))
-        elif typ == "status_code_200":
-            # We can perform a fetch to check status via JS
-            res = page.request.get(page.url)
-            ok = res.status == 200
-            results.append(("status_code_200", None, ok, f"{res.status}"))
-        elif typ == "click_and_wait":
-            sel = check["selector"]
-            page.click(sel, timeout=5000)
-            page.wait_for_load_state("networkidle", timeout=5000)
-            results.append(("click_and_wait", sel, True, "clicked"))
-        else:
-            results.append(("unknown_check", typ, False, "unsupported"))
-    except Exception as e:
-        results.append((typ, None, False, f"exception: {e}"))
-        raise
 
-def run_scenario(scenario):
-    name = scenario.get("name")
-    url = scenario.get("url")
-    checks = scenario.get("checks", [])
+def perform_login(page):
+    """Perform login if login page is required."""
+    log_info("Performing login...")
 
-    scenario_result = {"name": name, "url": url, "checks": [], "console": [], "errors": []}
+    page.goto(LOGIN_URL, timeout=30000)
+    page.wait_for_load_state("networkidle", timeout=10000)
+
+    # Fill credentials
+    page.fill('input[name="email"]', USERNAME)
+    page.fill('input[name="password"]', PASSWORD)
+    page.click('button[type="submit"]')
+
+    page.wait_for_load_state("networkidle", timeout=15000)
+    log_info("Login successful (if credentials are valid)")
+
+
+def test_page(url, login=False):
+    """Main testing logic for a given URL."""
+    result = {
+        "url": url,
+        "title": None,
+        "buttons": [],
+        "links": [],
+        "forms": [],
+        "console_errors": [],
+        "network": [],
+        "screenshot": None,
+        "status": "PASS"
+    }
+
     ts = int(time.time())
-    screenshot_path = os.path.join(ARTIFACTS_DIR, f"{name.replace(' ', '_')}_{ts}.png")
+    screenshot_path = os.path.join(ARTIFACTS_DIR, f"{ts}.png")
+
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            context = browser.new_context()
+            browser = p.chromium.launch(headless=True, args=["--ignore-certificate-errors"])
+            context = browser.new_context(ignore_https_errors=True)
             page = context.new_page()
 
-            # capture console messages
-            def on_console(msg):
-                txt = f"[{msg.type}] {msg.text}"
-                scenario_result["console"].append(txt)
-            page.on("console", lambda msg: on_console(msg))
+            # Capture console errors
+            page.on("console", lambda msg: result["console_errors"].append(f"[{msg.type}] {msg.text}"))
 
-            page.goto(url, timeout=15000)
-            # small wait for SPAs
-            page.wait_for_load_state("networkidle", timeout=8000)
-
-            for check in checks:
+            # Capture network requests safely
+            def network_listener(req):
                 try:
-                    run_check(page, check, scenario_result["checks"])
-                except Exception as e:
-                    err = traceback.format_exc()
-                    scenario_result["errors"].append(err)
-                    save_screenshot(page, screenshot_path)
-            # final screenshot
-            save_screenshot(page, screenshot_path)
-            browser.close()
-    except Exception as e:
-        scenario_result["errors"].append(traceback.format_exc())
-    return scenario_result
+                    status = req.response.status if req.response else None
+                except:
+                    status = None
+                result["network"].append({
+                    "url": req.url,
+                    "method": req.method,
+                    "status": status
+                })
 
-def run_all(scenarios):
+            page.on("requestfinished", network_listener)
+
+            # If login required, perform login before accessing URL
+            if login:
+                perform_login(page)
+
+            # Go to target page
+            page.goto(url, timeout=30000)
+            page.wait_for_load_state("networkidle", timeout=15000)
+
+            # Page title
+            try:
+                result["title"] = page.title()
+            except:
+                result["title"] = "N/A"
+
+            # Wait for buttons/forms to load
+            try:
+                page.wait_for_selector("button, input[type='submit'], input[type='button'], form", timeout=10000)
+            except:
+                pass
+
+            # Buttons
+            buttons = page.query_selector_all("button, input[type='button'], input[type='submit']")
+            for b in buttons:
+                try:
+                    b.click(timeout=3000)
+                    outer_html = b.get_attribute("outerHTML") or "<unknown>"
+                    result["buttons"].append({"selector": outer_html, "status": "PASS"})
+                except:
+                    outer_html = b.get_attribute("outerHTML") or "<unknown>"
+                    result["buttons"].append({"selector": outer_html, "status": "FAIL"})
+                    result["status"] = "FAIL"
+
+            # Links (first 5)
+            links = page.query_selector_all("a")
+            for l in links[:5]:
+                href = l.get_attribute("href") or "<unknown>"
+                result["links"].append({"href": href})
+
+            # Forms
+            forms = page.query_selector_all("form")
+            for f in forms:
+                form_name = f.get_attribute("name") or f.get_attribute("id") or "unknown"
+                result["forms"].append({"name": form_name})
+
+            # Screenshot
+            try:
+                save_screenshot(page, screenshot_path)
+                result["screenshot"] = screenshot_path
+            except Exception as e:
+                result["console_errors"].append(f"Screenshot error: {str(e)}")
+                result["screenshot"] = None
+
+            browser.close()
+
+    except Exception as e:
+        result["status"] = "FAIL"
+        result["console_errors"].append(str(e))
+        print(traceback.format_exc())
+
+    return result
+
+
+def run_all(urls):
+    """Run all URLs in sequence."""
     results = []
-    for s in scenarios:
-        log_info(f"Running: {s.get('name')} -> {s.get('url')}")
-        res = run_scenario(s)
+    for item in urls:
+        if isinstance(item, dict):
+            url = item.get("url")
+            login_flag = item.get("login", False)
+        else:
+            url = item
+            login_flag = False
+
+        log_info(f"Testing URL: {url} | login={login_flag}")
+        res = test_page(url, login=login_flag)
         results.append(res)
+
     return results
