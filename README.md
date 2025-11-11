@@ -148,6 +148,5 @@ This project is MIT Licensed — open source and free to use.
 🔹 Contact
 
 Maintainer: Khizar Saqib
-Email: khizar@example.com
- (replace with actual)
-GitHub: https://github.com/khizar-saqib
+Email: khzrsaqib@gmail.com
+GitHub: https://github.com/khizarkk7
