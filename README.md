@@ -2,7 +2,7 @@ QA Agent Console — Automated Frontend QA Tool
 
 Open-Source QA Automation Agent for Angular/SPA Applications
 
-🔹 Project Overview
+Project Overview
 
 This project is a console-based QA Agent designed to automate frontend testing for web applications, especially SPAs (Single Page Applications) built with frameworks like Angular or React.
 
@@ -18,13 +18,17 @@ Logging and Screenshots: for easy debugging of failures
 
 Purpose:
 
-Automatically test web pages for key checks (title, element presence, console errors, status codes).
+Automatically test web pages for key checks (title, element presence, console errors, status codes)
 
-Generate actionable QA reports for developers and testers.
+Generate actionable QA reports for developers and testers
 
-Serve as a foundation for building more advanced QA agents for open-source contribution.
+Serve as a foundation for building more advanced QA agents for open-source contribution
 
-🔹 Features
+Screenshot Placeholder:
+
+[Insert sample QA Agent test screenshot here]
+
+Features
 
 Test multiple pages using JSON-based scenarios
 
@@ -38,7 +42,11 @@ Console-based output and optional file reports
 
 Easy to extend with new checks and scenarios
 
-🔹 Getting Started
+Screenshot Placeholder:
+
+[Insert screenshot showing feature execution here]
+
+Getting Started
 Prerequisites
 
 Python 3.11+ installed
@@ -77,7 +85,7 @@ USE_HF=false
 ARTIFACTS_DIR=artifacts
 
 
-Define your QA scenarios in scenarios.json (example):
+Define QA scenarios in scenarios.json (example):
 
 [
   {
@@ -97,31 +105,39 @@ python run_tests.py
 
 Console will display results for each page
 
-Screenshots and QA report saved in artifacts/ folder
+Screenshots and QA report will be saved in the artifacts/ folder
 
 AI-based summarization will be generated if OPENAI_API_KEY is provided
 
-🔹 How It Works
+Screenshot Placeholder:
 
-Scenario Loader: Reads JSON test scenarios.
+[Insert screenshot of console test output here]
 
-Playwright Test Runner: Opens browser, navigates pages, performs checks, captures console logs and errors.
+How It Works
 
-Reporter: Summarizes results in console and/or AI-generated report.
+Scenario Loader: Reads JSON test scenarios
 
-Artifacts: Screenshots and reports saved for debugging and tracking.
+Playwright Test Runner: Opens browser, navigates pages, performs checks, captures console logs and errors
 
-🔹 Contributing
+Reporter: Summarizes results in console and/or AI-generated report
 
-This project is open source. We welcome contributions to improve QA checks, reporting, and support for additional frameworks.
+Artifacts: Screenshots and reports saved for debugging and tracking
+
+Screenshot Placeholder:
+
+[Insert diagram or screenshot showing workflow here]
+
+Contributing
+
+This project is open source. Contributions are welcome to improve QA checks, reporting, and support for additional frameworks.
 
 How to contribute:
 
-Fork the repo
+Fork the repository
 
 Create a new branch: git checkout -b feature/new-check
 
-Make your changes / improvements
+Make your changes or improvements
 
 Commit changes: git commit -m "Add new check for login page"
 
@@ -129,11 +145,11 @@ Push to branch: git push origin feature/new-check
 
 Open a Pull Request
 
-🔹 Future Enhancements
+Future Enhancements
 
 Add support for login/authentication flows
 
-Visual regression testing with screenshots comparison
+Visual regression testing with screenshot comparisons
 
 Integration with CI/CD pipelines (GitHub Actions, Jenkins)
 
@@ -141,12 +157,13 @@ Extend checks for API responses and backend validation
 
 AI-powered suggestions for failing tests
 
-🔹 License
+License
 
-This project is MIT Licensed — open source and free to use.
+This project is licensed under MIT License — open source and free to use.
 
-🔹 Contact
+Contact
 
 Maintainer: Khizar Saqib
 Email: khzrsaqib@gmail.com
+
 GitHub: https://github.com/khizarkk7
