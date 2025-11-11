@@ -63,6 +63,11 @@ ARTIFACTS_DIR=artifacts
 ## Running the QA Agent
 python run_tests.py
 
+## Screen Shots
+
+![QA Agent Screenshot](artifacts/Homepage_1762860919.png)
+
+
 ## How It Works
 
 Scenario Loader: Reads JSON test scenarios
