@@ -1,0 +1,28 @@
+[
+  {
+    "name": "Homepage",
+    "url": "http://192.168.70.94:4200/",
+    "checks": [
+      {"type": "page_title_contains", "value": "K Store"},
+      {"type": "element_exists", "selector": "nav"},
+      {"type": "no_console_errors"}
+    ]
+  },
+  {
+    "name": "Product List",
+    "url": "http://192.168.70.94:4200/shop/levis",
+    "checks": [
+      {"type": "status_code_200"},
+      {"type": "element_exists", "selector": ".product-card"},
+      {"type": "click_and_wait", "selector": ".product-card:first-child a"}
+    ]
+  },
+  {
+    "name": "Checkout",
+    "url": "http://192.168.70.94:4200/shop/levis/checkout",
+    "checks": [
+      {"type": "page_title_contains", "value": "Cart"},
+      {"type": "element_exists", "selector": "#checkout-btn"}
+    ]
+  }
+]
